@@ -105,6 +105,8 @@ class wetterturnier_userclass extends wetterturnier_generalclass
         add_shortcode( 'wetterturnier_mapsforecasts',    array($this,'shortcode_wetterturnier_mapsforecasts') );
         add_shortcode( 'wetterturnier_mapsanalysis',     array($this,'shortcode_wetterturnier_mapsanalysis')  );
         add_shortcode( 'wetterturnier_soundingsmorten',  array($this,'shortcode_wetterturnier_soundingsmorten')  );
+        add_shortcode( 'wetterturnier_cosmomorten',      array($this,'shortcode_wetterturnier_cosmomorten')  );
+        add_shortcode( 'wetterturnier_iconepsmorten',    array($this,'shortcode_wetterturnier_iconepsmorten')  );
         add_shortcode( 'wetterturnier_synopsymbols',     array($this,'shortcode_wetterturnier_synopsymbols')  );
         add_shortcode( 'wetterturnier_archive',          array($this,'shortcode_wetterturnier_archive')       );
         add_shortcode( 'wetterturnier_bet',              array($this,'shortcode_wetterturnier_bet')           );
@@ -124,6 +126,8 @@ class wetterturnier_userclass extends wetterturnier_generalclass
         add_shortcode( 'wetterturnier_mosforecasts',     array($this,'shortcode_wetterturnier_mosforecasts') );
         add_shortcode( 'wetterturnier_stationinfo',      array($this,'shortcode_wetterturnier_stationinfo') );
         add_shortcode( 'wetterturnier_stationparamdisabled', array($this,'shortcode_wetterturnier_stationparamdisabled') );
+
+// wetterturnier_moses
 
         add_shortcode( 'wc', array($this,'shortcode_wtcode') );
 
@@ -487,6 +491,12 @@ class wetterturnier_userclass extends wetterturnier_generalclass
     }
     function shortcode_wetterturnier_soundingsmorten() {
         return($this->shortcode_include("views/soundings-morten.php"));
+    }
+    function shortcode_wetterturnier_cosmomorten() {
+        return($this->shortcode_include("views/cosmo-morten.php"));
+    }
+    function shortcode_wetterturnier_iconepsmorten() {
+        return($this->shortcode_include("views/iconeps-morten.php"));
     }
 
     /** Wetterturnier show archive list and values. 

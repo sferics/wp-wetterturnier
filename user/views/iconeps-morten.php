@@ -7,10 +7,10 @@ if ( $WTuser->access_denied() ) { return; }
 
 // Including the forecast map jquery plus required xml2json script here
 $WTuser->include_js_script("jquery.xml2json");
-$WTuser->include_js_script("wetterturnier.soundings-morten");
+$WTuser->include_js_script("wetterturnier.iconeps-morten");
 
 // Location of the xml file containing the 'available soundings'
-$xml_file = sprintf("%s/user/xmlfiles/soundings-morten.xml",
+$xml_file = sprintf("%s/user/xmlfiles/iconeps-morten.xml",
                     plugins_url("wp-wetterturnier"));
 ?>
 
@@ -108,7 +108,7 @@ jQuery(document).on('ready',function() {
       var width = (width > 1200) ? 1200 : width;
       $( "#wt-map-image" ).width( width );
    }
-   $("#wt-sounding-container").wtsoundingsmorten("<?php print $xml_file; ?>",setImageWidth);
+   $("#wt-sounding-container").wticonepsmorten("<?php print $xml_file; ?>",setImageWidth);
    $(window).resize(function(){ setImageWidth(); });
 });
 </script>

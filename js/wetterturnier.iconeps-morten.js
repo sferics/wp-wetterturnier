@@ -6,7 +6,7 @@ jQuery(document).on('ready',function() {
    // Copy jQuery to $
    $ = jQuery
 
-   $.fn.wtsoundingsmorten = function( xmlfile, callback = null ) {
+   $.fn.wticonepsmorten = function( xmlfile, callback = null ) {
 
       var target = $(this)
 
@@ -88,7 +88,7 @@ jQuery(document).on('ready',function() {
          $("<img id='wt-sounding-image'></img>").appendTo( target )
          $("<div id='wt-sounding-timeline'></div>").appendTo( target )
          $("<div id='wt-sounding-navigation'></div>").appendTo( target )
-         $("#wt-sounding-navigation").append("<div class='stations'>Stations</div>")
+         $("#wt-sounding-navigation").append("<div class='charts'>Charts</div>")
          $("#wt-sounding-navigation").append("<div class='clear'></div>")
 
          // Add functionality that each click onto the image itself
@@ -101,27 +101,27 @@ jQuery(document).on('ready',function() {
             else if ( e.keyCode == 37 ) { timestep_backwards(); }
             else if ( e.keyCode == 38 ) {
                 e.preventDefault()
-                var current = $("#wt-sounding-navigation .stations ul li.selected").index()+1
+                var current = $("#wt-sounding-navigation .charts ul li.selected").index()+1
                 // Remove current selection
-                $("#wt-sounding-navigation .stations ul li.selected").removeClass("selected")
+                $("#wt-sounding-navigation .charts ul li.selected").removeClass("selected")
                 // Add new selection
                 if ( current == 1 ) {
-                   var las = $("#wt-sounding-navigation .stations ul li").length
-                   $("#wt-sounding-navigation .stations ul li").last().addClass("selected")
+                   var las = $("#wt-sounding-navigation .charts ul li").length
+                   $("#wt-sounding-navigation .charts ul li").last().addClass("selected")
                 } else {
-                   $("#wt-sounding-navigation .stations ul li:nth-child("+(current-1)+")").addClass("selected")
+                   $("#wt-sounding-navigation .charts ul li:nth-child("+(current-1)+")").addClass("selected")
                 }
                 showImage(); // Update image
             } else if ( e.keyCode == 40 ) {
                 e.preventDefault()
-                var current = $("#wt-sounding-navigation .stations ul li.selected").index()+1
+                var current = $("#wt-sounding-navigation .charts ul li.selected").index()+1
                 // Remove current selection
-                $("#wt-sounding-navigation .stations ul li.selected").removeClass("selected")
+                $("#wt-sounding-navigation .charts ul li.selected").removeClass("selected")
                 // Add new selection
-                if ( current >= $("#wt-sounding-navigation .stations ul li").length ) {
-                   $("#wt-sounding-navigation .stations ul li").first().addClass("selected")
+                if ( current >= $("#wt-sounding-navigation .charts ul li").length ) {
+                   $("#wt-sounding-navigation .charts ul li").first().addClass("selected")
                 } else {
-                   $("#wt-sounding-navigation .stations ul li:nth-child("+(current+1)+")").addClass("selected")
+                   $("#wt-sounding-navigation .charts ul li:nth-child("+(current+1)+")").addClass("selected")
                 }
                 showImage(); // Update image
             }
@@ -135,20 +135,20 @@ jQuery(document).on('ready',function() {
       // Shows model selection
       function showSounding(data, selected) {
 
-         // Append available stations to navigation
-         var target = $("#wt-sounding-navigation").find(".stations").first();
-         $(target).empty().append("<h1>Station</h1><ul></ul>")
-         $.each(data.stations.station, function(key, val) {
+         // Append available charts to navigation
+         var target = $("#wt-sounding-navigation").find(".charts").first();
+         $(target).empty().append("<h1>Charts</h1><ul></ul>")
+         $.each(data.charts.chart, function(key, val) {
             // Default: take first one if input unset
             if ( selected == undefined ) { selected = val.imgname; }
             $(target).find("ul")
-               .append("<li station='"+val.imgname+"'>" + val.name + "</li>")
+               .append("<li chart='"+val.imgname+"'>" + val.name + "</li>")
             // If match:
-            alert(val.imgname)
             if ( selected == val.imgname ) { $(target).find("ul li").last().addClass("selected") } 
          });
+         
          // Appending interactive functionality
-         $("#wt-sounding-navigation .stations ul").on("click","li",function() {
+         $("#wt-sounding-navigation .charts ul").on("click","li",function() {
             $(this).parent("ul").find("li").removeClass('selected')
             $(this).addClass('selected')
             showImage() // Update image
@@ -180,12 +180,13 @@ jQuery(document).on('ready',function() {
 
       // Shows the image
       function showImage( ) {
-
+         
          // Load key of current selected model
-         var station = $("#wt-sounding-navigation .stations   ul li.selected").attr("station")
-         var time    = $("#wt-sounding-timeline               ul li.selected").attr("time")
-         var image = "https://userpage.fu-berlin.de/mammatus95/cosmo/00/soundings/"
-                   + "stuve_"+station+"_"+time+".png"
+         var chart = $("#wt-sounding-navigation .charts   ul li.selected").attr("chart")
+         var time  = $("#wt-sounding-timeline             ul li.selected").attr("time")
+         var image = "https://userpage.fu-berlin.de/mammatus95/icon/eps/"
+                   + chart +"_12_"+time+".png"
+         
          $("#wt-sounding-image").attr("src",image).error( function() {
             $(this).attr("src","/referrerdata/soundings_missing_image.png");
          });

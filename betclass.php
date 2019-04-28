@@ -281,7 +281,7 @@ class wetterturnier_betclass
    }
    
    
-   // ---------------------------------------------------------------
+   //  --------------------------------------------------------------
    /// @details Returns summary of the received data.
    ///
    /// @param $data. stdClass object containing the required user input
@@ -446,36 +446,26 @@ class wetterturnier_betclass
        $res->param = $param; $res->value = $value;
 
        $pconfig = $WTuser->get_param_by_name( $param );
-       // If value is NULL simply return
+       // If value is NULL simply return NULL
        if ( is_null($value) ) { return($res); }
        // If parameter is out of range: return array(false,NULL);
-       if ( $value < $pconfig->valmin || $value > $pconfig->valmax ) {
+       if ( $value != $pconfig->valext && ( $value < $pconfig->valmin || $value > $pconfig->valmax ) ) {
            $res->value = NULL;
            $res->error = sprintf("Value was outside its limits for parameter \"%s\". "
-                    ."Defined range is %.1f to %.1f. Your submitted value was \"%.1f\". "
-                    ."Set to NULL!",$param,$pconfig->valmin/10.,$pconfig->valmax/10.,$value/10.);
+                    ."Defined range is %.1f to %.1f plus extra value %.1f. Your submitted value was \"%.1f\". "
+                    ."Set to NULL!",$param,$pconfig->valmin/10.,$pconfig->valmax/10.,$pconfig->valext/10, $value/10.);
+
            return( $res );
        }
-
-       // If parameter is 'fx' and value is between 0 and 250: correct
-       // to 0! 250 is 25 knots. All below should be reduced to 0.
-       if ( strcmp("fx",$param) === 0 && $value > 0 && $value < 250 ) {
-           $res->value = 0;
-           $res->warning = sprintf("Corrected wind gust bet. fx is not allowed "
-               ."to be between 0 and 25.0. Should either be 0, or 25-Inf. Your "
-               ."value was corrected from %.1f to %.1f",$value/10.,$res->value/10);
-       }
-
-       // If parameter is precipitation (RR) and value is between -30 and 0
-       // (which means precip -3.0 and 0) setting value to -30.
-       if ( strcmp("RR",$param) === 0 && $value > -30 && $value < 0 ) {
-           $res->value = -30;
-           $res->warning = sprintf("Corrected precipitation bet. RR is not allowed "
-               ."to be between -3.0 and 0.0. Should either be -3.0, or 0-Inf. Your "
-               ."value was corrected from %.1f to %.1f",$value/10.,$res->value/10.);
-       }
-
-       // Else return this object. 
+       $pre = $pconfig->valpre;
+       // Else return this object but round it first, if neccesary because of ruling defined in valpre (0,-1,-2 decimal places).
+       if ( $pre != 1 && $value%10**(-$pre) != 0 ) {
+       // printf($pconfig->valpre);
+       $value = round($value, $pconfig->valpre);
+       
+       $res->error = sprintf("Your invalid value for %s has been rounded to %.1f!", $param, $value/10);
+       $res->value = $value/10;
+}
        return( $res );
    }
 
