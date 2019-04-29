@@ -89,6 +89,7 @@ class wetterturnier_betclass
       $lookup = array( "stadt" => "city",     //i
                        "aa"    => "user",     //reto
                        "bb"    => "password", //wetter
+                       "td"    => "tdate",    //20190426
                        "cc"    => "N_1",      //8
                        "dd"    => "N_2",      //6
                        "ww"    => "Sd_1",     //4
@@ -148,7 +149,7 @@ class wetterturnier_betclass
          error(12);
       }
       $res->city = $cityhash[strtolower($res->city)];
-   
+
       return( $res );
    
    }
@@ -231,12 +232,18 @@ class wetterturnier_betclass
                error(14);
             }
             $res->$rec = $data->$rec;
+            
+            //For MOS belated submit use "tdate"
+            if ( property_exists( $data , "tdate") ) {
+            $res->tdate = round(strtotime($data->tdate) / 86400);
+            }
+            //
          }
-      }
-   
+      }   
+
       // Looping trough parameters. The ones defined in $no_param
       // will be ignored (as they are already processed and no parameters)
-      $no_params = array("user","password","city","submit","cityID");
+      $no_params = array("user","password","city","submit","cityID","tdate");
       foreach ( $data as $key => $val ) {
 
          // Skip those from no_param
@@ -281,7 +288,7 @@ class wetterturnier_betclass
    }
    
    
-   //  --------------------------------------------------------------
+   // ---------------------------------------------------------------
    /// @details Returns summary of the received data.
    ///
    /// @param $data. stdClass object containing the required user input
@@ -386,8 +393,8 @@ class wetterturnier_betclass
       return( array($data, $check) );
    
    }
-   
-   
+
+
    // ---------------------------------------------------------------
    /// @details Check if received values were valid. Corrects some of the
    ///   data or drops them if values were in a wrong format or something. 
@@ -469,7 +476,7 @@ class wetterturnier_betclass
        return( $res );
    }
 
-   
+
    // --------------------------------------------------------------
    /// @details Shows a summary of the parsed (and possibly corrected)
    ///   data submitted by the user. The function also shows whether
@@ -599,7 +606,7 @@ class wetterturnier_betclass
    /// @param $adminuser. Default `NULL`. If not `NULL` this indicates
    ///   that an administrator currently changes the data/forecast.
    // --------------------------------------------------------------
-   function write_to_database( $user, $next, $data, $checkflag, $verbose = true, $adminuser=NULL ) {
+   function write_to_database( $user, $next, $data, $checkflag, $verbose = true, $adminuser=NULL, $placedby=NULL ) {
    
       global $WTuser;
       global $wpdb;
@@ -663,10 +670,15 @@ class wetterturnier_betclass
                          "betdate"        => $betdate,
                          "value"          => $value,
                          "placedby"       => 0 );
+
             // Admin mode: check if the admin really changed this value.
-            if ( ! is_null($adminuser) ) {
-               $tmp['placedby'] = set_placedby_if_changed($tmp,$existing,$adminuser->data->ID);
-            }
+            
+            if ( ! is_null($adminuser) && is_null($placedby) ) {
+               
+               $tmp['placedby'] = set_placedby_if_changed($tmp,$existing,$adminuser->ID);
+
+               } else { $tmp['placedby'] = $placedby; }
+            
             
             array_push($data4db,$tmp);
             unset($tmp);
@@ -675,7 +687,7 @@ class wetterturnier_betclass
    
       // No data to write to database?
       if ( count($data4db) == 0 ) {
-         printf("No data to write to database! All rejected nor not submitted?\n");
+         printf("No data to write to database! All rejected or not submitted?\n");
          $this-> error(9);
       } 
     
@@ -1213,7 +1225,7 @@ class wetterturnier_betclass
    /// @details Update or insert bet in the database.
    /// 
    /// @param next. stdClass tournament date object. Default `NULL` if a user inserts
-   ///   a bet on the frontend. If an admin maniplates the bets of
+   ///   a bet on the frontend. If an admin manipulates the bets of
    ///   a user, this should be used (to define for which date the
    ///   changes should be stored).
    /// @param user. Wordpress user object. Same as for next: is `NULL` if
