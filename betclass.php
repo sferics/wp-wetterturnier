@@ -89,7 +89,7 @@ class wetterturnier_betclass
       $lookup = array( "stadt" => "city",     //i
                        "aa"    => "user",     //reto
                        "bb"    => "password", //wetter
-                       "td"    => "tdate",    //20190426
+                       "td"    => "tdate",    //2019-04-26
                        "cc"    => "N_1",      //8
                        "dd"    => "N_2",      //6
                        "ww"    => "Sd_1",     //4
@@ -467,8 +467,9 @@ class wetterturnier_betclass
        $pre = $pconfig->valpre;
        // Else return this object but round it first, if neccesary because of ruling defined in valpre (0,-1,-2 decimal places).
        if ( $pre != 1 && $value%10**(-$pre) != 0 ) {
-       // printf($pconfig->valpre);
-       $value = round($value, $pconfig->valpre);
+
+       // Round the entered value mathematically:
+       $value = round($value, $pconfig->valpre, PHP_ROUND_HALF_EVEN );
        
        $res->error = sprintf("Your invalid value for %s has been rounded to %.1f!", $param, $value/10);
        $res->value = $value/10;
@@ -673,12 +674,13 @@ class wetterturnier_betclass
 
             // Admin mode: check if the admin really changed this value.
             
-            if ( ! is_null($adminuser) && is_null($placedby) ) {
+            if ( ! is_null($adminuser) ) {
+               if ( is_null($placedby) ) {
                
                $tmp['placedby'] = set_placedby_if_changed($tmp,$existing,$adminuser->ID);
 
                } else { $tmp['placedby'] = $placedby; }
-            
+            }
             
             array_push($data4db,$tmp);
             unset($tmp);
