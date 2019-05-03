@@ -1647,32 +1647,34 @@ class wetterturnier_userclass extends wetterturnier_generalclass
       $param    = str_replace(" ","",$_REQUEST['param']);
 
       // Printing output
-      $cmd_base = "cd /home/wetterturnier/wetterturnier-backend && venv/bin/python TestPoints.py --quiet";
+      $cmd = "cd /home/wetterturnier/wetterturnier-backend && venv/bin/python TestPoints.py ";
 
       // Special observations? The extra obs
       if ( empty($_REQUEST['extra1']) && empty($_REQUEST['extra2']) ) {
          // Printing output
-         $cmd = sprintf("%s -p %s -o %.1f,%.1f -v %.1f",$cmd_base,$param,$obs1,$obs2,$forecast);
+         $args = sprintf("-p %s -o %.1f,%.1f -v %.1f",$param,$obs1,$obs2,$forecast);
       } else {
          $extra1 = (float)$_REQUEST['extra1'];
          $extra2 = (float)$_REQUEST['extra2'];
-         $cmd = sprintf("%s -p %s -o %.1f,%.1f -v %.1f -s %.1f,%.1f",
-                        $cmd_base,$param,$obs1,$obs2,$forecast,$extra1,$extra2);
+         $args = sprintf("-p %s -o %.1f,%.1f -v %.1f -s %.1f,%.1f",
+                 $param,$obs1,$obs2,$forecast,$extra1,$extra2);
       }
 
-
       // Calling the py script
-      $result = shell_exec($cmd); 
+      $result = exec($cmd.escapeshellarg($args));
       // Expect that the LAST word will be the points
       preg_match_all("/points\s{1,}([-]{0,1}[0-9]{1,}[.]{1}[0-9]{0,})?/",$result,$matches);
       // Setting points value
+
+/**
       if ( empty($matches[1][0]) ) {
          $points = "empty"; 
       } else {
          $points = array_pop($matches[1]);
       }
+*/
       print json_encode( array("cmd"=>$cmd,"points"=>$points) );
-
+      
       die();
 
    }
